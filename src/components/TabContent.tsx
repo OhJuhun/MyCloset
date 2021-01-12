@@ -14,11 +14,12 @@ const TabContent = () => {
   const classes = useStyles();
   const [value, setValue] = useState("");
   const history = useHistory();
+
   const onChange = useCallback((event: object, newValue: string) => {
     setValue(newValue);
     history.push(newValue);
-  }, [value])
-  //TODO 아래로 내림 메뉴만들기
+  }, [value]);
+
   return (
         <Tabs value={value} indicatorColor={'primary'} textColor={'primary'} centered onChange={onChange}>
           {tabMenu.map((item) => {
