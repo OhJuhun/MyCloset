@@ -19,10 +19,19 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import tabMenu from "config/tabMenu";
-import subTabMenu from "../config/subTabMenu";
-//TODO config/ 에서 가져오기
 
 const drawerWidth = 240;
+
+interface SubListProps {
+  key: string;
+  label: string;
+}
+
+interface ListProps {
+  key: string;
+  label: string;
+  subTabMenu: Array<SubListProps>;
+}
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -60,7 +69,6 @@ const useStyles = makeStyles((theme: Theme) =>
         display: 'flex',
         alignItems: 'center',
         padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
         ...theme.mixins.toolbar,
         justifyContent: 'flex-end',
       },
@@ -73,6 +81,9 @@ const useStyles = makeStyles((theme: Theme) =>
         }),
         marginLeft: -drawerWidth,
       },
+      nested: {
+        paddingLeft: theme.spacing(4),
+      },
       contentShift: {
         transition: theme.transitions.create('margin', {
           easing: theme.transitions.easing.easeOut,
@@ -82,16 +93,11 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     }),
 );
-interface SubTabMenu{
-  label: string;
-  key: string;
-} //TODO 이 인터페이스 적용
 
 export default function PersistentDrawerLeft() {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -99,6 +105,10 @@ export default function PersistentDrawerLeft() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  const handleClick = (event: object, key: string) => {
+
+  }
 
   return (
       <div className={classes.root}>
@@ -140,27 +150,29 @@ export default function PersistentDrawerLeft() {
           </div>
           <Divider/>
           <List>
-            {tabMenu.map((item) => {
-              return (
-                  <Grid>
-                    <ListItem button key={item.key}>
-                      <ListItemText primary={item.label}/>
-                      {false ? <ExpandLess /> : <ExpandMore />}
-                    </ListItem>
-                    <Collapse in={false} timeout={'auto'} unmountOnExit>
-                      <List component={'div'} disablePadding>
-                        {subTabMenu.map((subItem: any) => {
-                          return (
-                              <ListItem button key={subItem.key}>
-                                <ListItemText primary={subItem.label}/>
-                              </ListItem>
-                          );
-                        })}
-                      </List>
-                    </Collapse>
-                  </Grid>
-              );
-            })}
+            <Grid>
+              {tabMenu.map((item: ListProps) => {
+                return (
+                    <Grid>
+                      <ListItem button key={item.key}>
+                        <ListItemText primary={item.label}/>
+                        {true ? <ExpandLess/> : <ExpandMore/>}
+                      </ListItem>
+                      <Collapse key={item.key} component={"li"} unmountOnExit in={true}>
+                        <List>
+                          {item.subTabMenu.map((subMenu: SubListProps) => {
+                            return (
+                                <ListItem button key={subMenu.key} className={classes.nested}>
+                                  <ListItemText primary={subMenu.label}/>
+                                </ListItem>
+                            ) //TODO 접히는 기능 만들기
+                          })}
+                        </List>
+                      </Collapse>
+                    </Grid>
+                );
+              })};
+            </Grid>
           </List>
           <Divider/>
         </Drawer>
