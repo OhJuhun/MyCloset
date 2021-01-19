@@ -97,17 +97,19 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function PersistentDrawerLeft() {
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [sideBarOpen, setSideBarOpen] = React.useState(false);
+  const [collapse, setCollapse] = React.useState(false);
+
   const handleDrawerOpen = () => {
-    setOpen(true);
+    setSideBarOpen(true);
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    setSideBarOpen(false);
   };
 
-  const handleClick = (event: object, key: string) => {
-
+  const onClick = (event: React.MouseEvent<HTMLElement>) =>{
+    setCollapse(!collapse);
   }
 
   return (
@@ -116,7 +118,7 @@ export default function PersistentDrawerLeft() {
         <AppBar
             position="fixed"
             className={clsx(classes.appBar, {
-              [classes.appBarShift]: open,
+              [classes.appBarShift]: sideBarOpen,
             })}
         >
           <Toolbar>
@@ -125,7 +127,7 @@ export default function PersistentDrawerLeft() {
                 aria-label="open drawer"
                 onClick={handleDrawerOpen}
                 edge="start"
-                className={clsx(classes.menuButton, open && classes.hide)}
+                className={clsx(classes.menuButton, sideBarOpen && classes.hide)}
             >
               <MenuIcon/>
             </IconButton>
@@ -138,7 +140,7 @@ export default function PersistentDrawerLeft() {
             className={classes.drawer}
             variant="persistent"
             anchor="left"
-            open={open}
+            open={sideBarOpen}
             classes={{
               paper: classes.drawerPaper,
             }}
@@ -154,18 +156,18 @@ export default function PersistentDrawerLeft() {
               {tabMenu.map((item: ListProps) => {
                 return (
                     <Grid>
-                      <ListItem button key={item.key}>
+                      <ListItem button key={item.key} onClick={onClick}>
                         <ListItemText primary={item.label}/>
-                        {true ? <ExpandLess/> : <ExpandMore/>}
+                        {collapse ? <ExpandLess/> : <ExpandMore/>}
                       </ListItem>
-                      <Collapse key={item.key} component={"li"} unmountOnExit in={true}>
+                      <Collapse key={item.key+"collapse"} component={"li"} unmountOnExit in={collapse}> {/* key를 이렇게 가져가도 되나?*/}
                         <List>
                           {item.subTabMenu.map((subMenu: SubListProps) => {
                             return (
                                 <ListItem button key={subMenu.key} className={classes.nested}>
                                   <ListItemText primary={subMenu.label}/>
                                 </ListItem>
-                            ) //TODO 접히는 기능 만들기
+                            )
                           })}
                         </List>
                       </Collapse>
@@ -178,7 +180,7 @@ export default function PersistentDrawerLeft() {
         </Drawer>
         <main
             className={clsx(classes.content, {
-              [classes.contentShift]: open,
+              [classes.contentShift]: sideBarOpen,
             })}
         >
           <div className={classes.drawerHeader}/>
